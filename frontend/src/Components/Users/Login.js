@@ -1,14 +1,55 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Register.css";
-import UserRegisterContex from "../Store/UserRegisterContex";
-import { ErrorMessage, Field, Formik, Form } from "formik";
-import * as Yup from "yup";
-import Swal from "sweetalert2";
+import AuthService from "../../services/authservice";
 
 export const Login = () => {
   const navigate = useNavigate();
-  const [state, dispatch] = useContext(UserRegisterContex);
+
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+  });
+  const [successful, setSuccessful] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const validationLoginHandler = () => {
+    if (!user.email || !user.password) {
+      setSuccessful(false);
+      setMessage("All fields are required!");
+      return false;
+    }
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(user.email)) {
+      setSuccessful(false);
+      setMessage("Please enter valid email.");
+      return false;
+    }
+    if (user.password.length < 8 || user.password.length > 40) {
+      setSuccessful(false);
+      setMessage("The password must be between 8 and 40 characters.");
+      return false;
+    }
+    return true;
+  };
+
+  const onChangeHandler = (e) => {
+    const { name, value } = e.target;
+    setUser({
+      ...user,
+      [name]: value,
+    });
+  };
+
+  const loginSubmitHandler = (e) => {
+    e.preventDefault();
+    var formIsValid = validationLoginHandler();
+    if (formIsValid) {
+      AuthService.login(user).then((response) => {   
+        console.log(response);
+          navigate("/Homepage"); 
+      });
+    }
+  };
 
   return (
     <section
@@ -27,98 +68,60 @@ export const Login = () => {
                   <h2 className="text-uppercase text-center mb-5">
                     Login Account
                   </h2>
-
-                  <Formik
-                    initialValues={{ email: "", password: "" }}
-                    validationSchema={Yup.object({
-                      email: Yup.string()
-                        .required("Email field is required !")
-                        .email("Invalid email format"),
-                      password: Yup.string()
-                        .required("Password field is required !")
-                        .min(8, "Password must be at least 8 characters"),
-                    })}
-                    onSubmit={async (values, { setSubmitting }) => {
-                      try {
-                        const user = state.registerdata.find(
-                          (u) => u.email === values.email
-                        );
-                        console.log(user);
-                        if (user !== undefined) {
-                          if (user.password === values.password) {
-                            navigate("/Homepage");
-                          } else {
-                            Swal.fire("Wrong Password");
+                  <form onSubmit={loginSubmitHandler}>
+                    {message && (
+                      <div className="form-group">
+                        <div
+                          className={
+                            successful
+                              ? "alert alert-success"
+                              : "alert alert-danger"
                           }
-                        } else {
-                          Swal.fire("Invalid Credentials");
-                        }
-                        let userdata = {
-                          isLogin: true,
-                          user,
-                        };
-                        dispatch({
-                          type: "LOGIN",
-                          payload: userdata,
-                        });
-                      } catch (e) {
-                        if (e.response.state.registerdata !== undefined) {
-                          Swal.fire(
-                            e.response.state.registerdata.message,
-                            "",
-                            "error"
-                          );
-                        }
-                      }
-                    }}
-                  >
-                    {({ values, handleChange }) => (
-                      <Form>
-                        <div className="form-outline mb-4">
-                          <Field
-                            type="email"
-                            className="form-control form-control-lg"
-                            name="email"
-                            onChange={handleChange}
-                            value={values.email}
-                          />
-                          <label className="form-label">Your Email</label>
+                          role="alert"
+                        >
+                          {message}
                         </div>
-                        <span>
-                          <ErrorMessage name="email" />
-                        </span>
-                        <div className="form-outline mb-4">
-                          <Field
-                            type="password"
-                            className="form-control form-control-lg"
-                            name="password"
-                            onChange={handleChange}
-                            value={values.password}
-                          />
-                          <label className="form-label">Password</label>
-                        </div>
-                        <span>
-                          <ErrorMessage name="password" />
-                        </span>
-                        <div className="d-flex justify-content-center">
-                          <button
-                            type="submit"
-                            className="btn btn-success btn-block btn-lg gradient-custom-4 text-body"
-                          >
-                            Login
-                          </button>
-                        </div>
-                        <p className="text-center text-muted mt-5 mb-0">
-                          For Create New Account{" "}
-                          <a className="fw-bold text-body">
-                            <u>
-                              <Link to="/Register">Register Here</Link>
-                            </u>
-                          </a>
-                        </p>
-                      </Form>
+                      </div>
                     )}
-                  </Formik>
+                    <div className="form-outline mb-4">
+                      <input
+                        type="email"
+                        className="form-control form-control-lg"
+                        name="email"
+                        onChange={onChangeHandler}
+                        value={user.email}
+                      />
+                      <label className="form-label">Your Email</label>
+                    </div>
+
+                    <div className="form-outline mb-4">
+                      <input
+                        type="password"
+                        className="form-control form-control-lg"
+                        name="password"
+                        onChange={onChangeHandler}
+                        value={user.password}
+                      />
+                      <label className="form-label">Password</label>
+                    </div>
+
+                    <div className="d-flex justify-content-center">
+                      <button
+                        type="submit"
+                        className="btn btn-success btn-block btn-lg gradient-custom-4 text-body"
+                      >
+                        Login
+                      </button>
+                    </div>
+                    <p className="text-center text-muted mt-5 mb-0">
+                      For Create New Account{" "}
+                      <a className="fw-bold text-body">
+                        <u>
+                          <Link to="/Register">Register Here</Link>
+                        </u>
+                      </a>
+                    </p>
+                  </form>
                 </div>
               </div>
             </div>

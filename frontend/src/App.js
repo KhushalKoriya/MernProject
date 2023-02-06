@@ -3,7 +3,6 @@ import { Home } from "./Components/Home";
 import { Register } from "./Components/Users/Register";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Mainpage } from "./Components/Mainpage";
-import { UserRegisterProvider } from "./Components/Store/UserRegisterProvider";
 import { Login } from "./Components/Users/Login";
 import { Aboutus } from "./Components/Pages/Aboutus";
 import { Features } from "./Components/Pages/Features";
@@ -14,7 +13,6 @@ import { My404Component } from "./Components/My404Component";
 function App() {
   return (
     <>
-      <UserRegisterProvider>
         <BrowserRouter>
           <Routes>
           <Route path='*' exact={true} element={<My404Component/>} />
@@ -31,7 +29,6 @@ function App() {
             </Route>
           </Routes>
         </BrowserRouter>
-      </UserRegisterProvider>
     </>
   );
 }
