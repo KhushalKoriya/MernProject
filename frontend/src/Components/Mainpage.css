@@ -1,0 +1,35 @@
+.form{
+    margin: 136px 0px 514px 703px;
+    width: 24%;
+}
+.form1{
+    margin: 134px 0px 496px 184px;
+    width: 79%;
+}
+.input{
+    margin-bottom: 18px
+}
+.use{
+    margin-bottom: 18px
+}
+.submit{
+    margin: 0px 1419px 27px 0px;
+}
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+  .modal-backdrop {
+    z-index: 0 !important;
+  }
