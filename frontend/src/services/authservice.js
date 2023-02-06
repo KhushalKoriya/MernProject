@@ -32,12 +32,12 @@ const login = async (user) => {
 
 //
 const logout = async () => {
-  localStorage.removeItem("user");
-  return axios.post("http://localhost:8081/logout",{ withCredentials: true}).then((response) => {
+  
+  return axios.post("http://localhost:8081/logout",{},{ withCredentials: true}).then((response) => {
+    localStorage.removeItem("user");
     return response.data;
   });
 };
-
 const AuthService = {
   register,
   login,

@@ -63,17 +63,15 @@ const loginUser = async (req, res) => {
 //For Logout
 const logoutUser = async (req, res) => {
 
-  // req.session.destroy((err) => {
-  //   //delete session data from store, using sessionID in cookie
-  //   if (err) throw err;
-  //   res.clearCookie("session_id"); // clears cookie containing expired sessionID
+  console.log("user logout");
 
-  //  return res.status(200).send({ message: "Logged out successfully." });
-  // });
-  console.log(req.session);
- req.session.destroy();
- res.clearCookie("session_id");
- res.send({ message: "user Logged out" });
+  req.session.destroy((err) => {
+    //delete session data from store, using sessionID in cookie
+    if (err) throw err;
+    res.clearCookie("session_id"); // clears cookie containing expired sessionID
+
+   return res.status(200).send({ message: "Logged out successfully." });
+  });
 
 }
 
