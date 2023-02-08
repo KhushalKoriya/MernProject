@@ -1,20 +1,34 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Dropdown } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import AuthService from "../../services/authservice";
+import Usercontex from "../Store/Usercontex";
 export const Header = () => {
   const navigate = useNavigate();
+  const { setUserData } = useContext(Usercontex);
   const authenticatedUser = localStorage.getItem("user");
-  const username = JSON.parse(authenticatedUser);
-  console.log(username.username);
+  
+  
 
   const userLogout = (e) => {
     e.preventDefault();
     AuthService.logout().then((response) => {
       console.log(response);
+      setUserData({
+        token: undefined,
+        user: undefined
+    })
+    // localStorage.setItem("auth-token","");
       navigate("/");
     });
   };
+
+  var username;
+  if(authenticatedUser === null){
+    return <Navigate to="/Login"/>
+  }else{
+   username = JSON.parse(authenticatedUser);
+  }
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">

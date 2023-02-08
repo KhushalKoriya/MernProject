@@ -1,12 +1,14 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import "./Register.css";
 import AuthService from "../../services/authservice";
+import Usercontex from "../Store/Usercontex";
 
 
 export const Register = () => {
   const navigate = useNavigate();
+  const { setUserData } = useContext(Usercontex);
   const [enteredValue, setEnteredValue] = useState({
     name: "",
     email: "",
@@ -57,6 +59,10 @@ export const Register = () => {
         setTimeout(() => {
           navigate("/Login");
         }, 5000);
+         setUserData({
+                token: response.sessUser.token,
+            });
+            // localStorage.setItem("auth-token", response.sessUser.token);
       });
     }
   };

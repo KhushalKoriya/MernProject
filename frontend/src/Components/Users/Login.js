@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Register.css";
 import AuthService from "../../services/authservice";
+import Usercontex from "../Store/Usercontex";
 
 export const Login = () => {
   const navigate = useNavigate();
+  const { setUserData } = useContext(Usercontex);
 
   const [user, setUser] = useState({
     email: "",
@@ -45,7 +47,12 @@ export const Login = () => {
     var formIsValid = validationLoginHandler();
     if (formIsValid) {
       AuthService.login(user).then((response) => {   
-        console.log(response);
+        console.log(response.sessUser.token);
+        setUserData({
+          isLoggedIn:true,
+          token:response.sessUser.token,
+      });
+      // localStorage.setItem("auth-token", response.sessUser.token);
           navigate("/Homepage"); 
       });
     }

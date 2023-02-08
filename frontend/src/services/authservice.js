@@ -1,5 +1,7 @@
 import axios from "axios";
 
+
+
 const register = (user) => {
   const { name, email, password } = { ...user };
   return axios.post("http://localhost:8081/Register", {
@@ -38,6 +40,7 @@ const logout = async () => {
     return response.data;
   });
 };
+
 const AuthService = {
   register,
   login,

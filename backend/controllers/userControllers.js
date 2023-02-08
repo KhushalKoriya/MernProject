@@ -1,17 +1,18 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user.js";
+import jwt from "jsonwebtoken";
 
 // For RegisterUser
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const encryptedPassword = await bcrypt.hash(password, 10);
+    // const encryptedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
       username: name,
       email: email.toLowerCase(),
-      password: encryptedPassword,
+      password:password
     });
     if (newUser) {
       return res
@@ -48,8 +49,9 @@ const loginUser = async (req, res) => {
       .status(400)
       .send({ message: "Authentication failed.Please enter valid password." });
   }
-  const sessUser = { id: isUserLoggedIn._id, isAdmin: isUserLoggedIn.isAdmin ,username: isUserLoggedIn.username };
-  console.log(sessUser);
+  const token = jwt.sign({ id: isUserLoggedIn._id }, process.env.SECRET);
+  const sessUser = { id: isUserLoggedIn._id, isAdmin: isUserLoggedIn.isAdmin ,username: isUserLoggedIn.username ,token};
+  // console.log(sessUser);
   req.session.user = sessUser;
 
   if (req.session.user) {
@@ -75,4 +77,31 @@ const logoutUser = async (req, res) => {
 
 }
 
-export { registerUser , loginUser ,logoutUser};
+//TokenisValid 
+const tokenIsValid = async (req, res) => {
+  try {
+    const token = req.header("x-auth-token");
+    if (!token) return res.json(false);
+
+    const verified = jwt.verify(token, process.env.SECRET);
+    if (!verified) return res.json(false);
+
+    const user = await User.findById(verified.id);
+    if (!user) return res.json(false);
+
+    return res.json(true);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+const authCheck =async (req, res) => {
+  const user = await User.findById(req.isUserLoggedIn);
+  res.json({
+    isLoggedIn:true,
+    username: user.username,
+    id: user._id,
+  });
+}
+
+export { registerUser , loginUser ,logoutUser, tokenIsValid,authCheck};
