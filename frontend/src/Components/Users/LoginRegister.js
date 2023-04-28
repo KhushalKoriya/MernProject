@@ -6,7 +6,7 @@ export const LoginRegister = () => {
     
   return (
     <>
-      <Mainpage />
+      {/* <Mainpage /> */}
       <Outlet />
     </>
   );

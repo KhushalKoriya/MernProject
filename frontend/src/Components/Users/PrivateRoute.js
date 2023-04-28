@@ -1,7 +1,7 @@
 import React from 'react'
 import { Redirect, Route, useNavigate } from 'react-router-dom'
 
-const PrivateRoute = ({ component: Component, ...rest }) => {
+const PrivateRoute = ({ element: Element, ...rest }) => {
   // Add your own authentication on the below line.
   const isLoggedIn = AuthService.isLoggedIn()
 
@@ -10,7 +10,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
       {...rest}
       render={props =>{
         return isLoggedIn ? (
-          <Component {...props} />
+          <Element {...props} />
         ) : (
           <useNavigate to={{ pathname: '/login', state: { from: props.location } }} />
         )

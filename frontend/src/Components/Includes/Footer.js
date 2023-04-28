@@ -36,7 +36,7 @@ export const Footer = () => {
   {/* Section: Social media */}
   {/* Section: Links  */}
   <section className>
-    <div className="container text-center text-md-start mt-5">
+    <div className="containerr text-center text-md-start mt-5">
       {/* Grid row */}
       <div className="row mt-3">
         {/* Grid column */}
