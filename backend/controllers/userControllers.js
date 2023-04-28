@@ -123,14 +123,14 @@ const forgotpassword =async(req,res)=>{
   //   const transporter = nodemailer.createTransport({
   //     service: 'Gmail',
   //     auth: {
-  //       user: 'kkoriya01@gmail.com',
-  //       pass: 'agqbgtkkadnznrlc',
+  //       user: process.env.SMTP_EMAIL,
+  //       pass: process.env.SMTP_PASSWORD,
   //     },
   //   });
 
   //   const mailOptions = {
   //     to: user.email,
-  //     from: 'kkoriya01@gmail.com',
+  //     from: process.env.SMTP_EMAIL,
   //     subject: 'Reset your password on YourAppName',
   //     text: `Hi ${user.username},\n\nYou are receiving this email because you (or someone else) have requested the reset of the password for your account on YourAppName.\n\nPlease click on the following link, or paste this into your browser to complete the process:\n\nhttp://${req.headers.host}/reset-password/${token}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
   //   };
@@ -159,13 +159,13 @@ const forgotpassword =async(req,res)=>{
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'kkoriya01@gmail.com',
-        pass: 'agqbgtkkadnznrlc',
+        user: process.env.SMTP_EMAIL ,
+        pass: process.env.SMTP_PASSWORD,
       },
     });
 
     const mailOptions = {
-      from: 'kkoriya01@gmail.com',
+      from: process.env.SMTP_EMAIL,
       to: email,
       subject: 'Reset Password',
       html: `
