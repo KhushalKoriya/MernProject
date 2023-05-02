@@ -14,6 +14,8 @@ import axios from 'axios';
 import { useEffect,useState } from "react";
 import { Forgotpassword } from "./Components/Users/Forgotpassword";
 import { Resetpassword } from "./Components/Users/Resetpassword";
+import { Sendotp } from "./Components/Users/Sendotp";
+import { Verifyotp } from "./Components/Users/Verifyotp";
 // import PrivateRoute from "./Components/Users/PrivateRoute";
 
 function App() {
@@ -62,6 +64,8 @@ function App() {
               <Route path="/forgot-password" element={<Forgotpassword />} />
               <Route path="/reset/:token" element={<Resetpassword />} />
               <Route path="/Login" element={<Login />} />
+              <Route path="/sendotp" element={<Sendotp />} />
+              <Route path="/otp/:token" element={<Verifyotp />} />
             <Route element={<LoginRegister />}>
               {/* <PrivateRoute path="/onlyAuthorizedAllowedHere/" element={<My404Component/>} /> */}
             </Route>

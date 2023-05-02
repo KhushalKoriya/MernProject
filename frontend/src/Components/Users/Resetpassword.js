@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 
 
 export const Resetpassword = (props) => {
@@ -48,6 +49,9 @@ export const Resetpassword = (props) => {
       />
       <button type="submit">Reset Password</button>
     </form>
+    <button className="ghost" id="signIn">
+          <Link to="/Login">Go back to Home</Link>
+          </button>
     </div>
   );
 }

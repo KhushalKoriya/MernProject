@@ -8,11 +8,11 @@ import "./Login.css";
 export const Login = () => {
   const navigate = useNavigate();
   const { setUserData } = useContext(Usercontex);
-
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
+  console.log("user",user);
   const [successful, setSuccessful] = useState(false);
   const [message, setMessage] = useState("");
 

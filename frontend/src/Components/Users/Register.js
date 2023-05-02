@@ -60,7 +60,7 @@ export const Register = () => {
           password: "",
         });
         setTimeout(() => {
-          navigate("/Login");
+          navigate("/sendotp");
         }, 5000);
         //  setUserData({
         //         token: response.sessUser.token,

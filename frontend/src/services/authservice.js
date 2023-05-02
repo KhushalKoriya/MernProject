@@ -41,18 +41,10 @@ const logout = async () => {
   });
 };
 
-const forgot = async ()=>{
-  const { email } = { ...user };
-  return axios.post("http://localhost:8081/forgot-password", {
-    email
-  });
-}
-
 const AuthService = {
   register,
   login,
   logout,
-  forgot,
 };
 
 export default AuthService;

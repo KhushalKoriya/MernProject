@@ -3,6 +3,7 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import otpGenerator from "otp-generator";
 
 // For RegisterUser
 const registerUser = async (req, res) => {
@@ -52,7 +53,7 @@ const loginUser = async (req, res) => {
       .send({ message: "Authentication failed.Please enter valid password." });
   }
   const token = jwt.sign({ id: isUserLoggedIn._id }, process.env.SECRET);
-  const sessUser = { id: isUserLoggedIn._id, isAdmin: isUserLoggedIn.isAdmin ,username: isUserLoggedIn.username ,token};
+  const sessUser = { id: isUserLoggedIn._id, isAdmin: isUserLoggedIn.isAdmin ,username: isUserLoggedIn.username ,token,active:isUserLoggedIn.active};
   // console.log(sessUser);
   req.session.user = sessUser;
 
@@ -62,6 +63,146 @@ const loginUser = async (req, res) => {
       .send({ message: "User login Successfully.", sessUser});
   }
 };
+
+
+//For Send OTP
+const sendotp = async (req,res)=>{
+
+  try {
+    const { email } = req.body;
+    const otp = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+    console.log("user",user);
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET, { expiresIn: '1h' });
+    console.log("token",token);
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_EMAIL ,
+        pass: process.env.SMTP_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: 'Reset Password',
+      html: `Your OTP is ${otp}
+        <p>You are receiving this email because you (or someone else) has requested a password reset for your account.</p>
+        <p>Please click on the following link or paste it into your browser to reset your password:</p>
+        <p>${process.env.CLIENT_URL}/otp/${token}</p>
+        <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+     res.status(200).json({ msg: 'OTP sent successfully!' });
+    user.otp = otp;
+await user.save();
+
+    // res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+
+  // const { email } = req.body;
+  // const user = await User.findOne({ email });
+  // const otp = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
+  // console.log("ues",user);
+  // Generate a 6-digit OTP
+  // const token = jwt.sign({ userId: user._id }, process.env.SECRET, { expiresIn: '1h' });
+  // console.log("tokennn",token);
+
+  // Create a Nodemailer transporter
+//   const transporter = nodemailer.createTransport({
+//     service: 'gmail',
+//     auth: {
+//       user: process.env.SMTP_EMAIL,
+//       pass: process.env.SMTP_PASSWORD,
+//     },
+//   });
+
+//   // Define the email options
+//   const mailOptions = {
+//     from: process.env.SMTP_EMAIL,
+//     to: email,
+//     subject: 'OTP verification code',
+//     html: `Your OTP is ${otp} && <br>
+//     <p>${process.env.CLIENT_URL}/otp</p>`,
+//   };
+
+//   // Send the email
+//   try {
+//     await transporter.sendMail(mailOptions);
+//     console.log(`OTP sent to ${email}: ${otp}`);
+//     res.status(200).json({ msg: 'OTP sent successfully!' });
+//     user.otp = otp;
+// await user.save();
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ msg: 'Failed to send OTP.' });
+//   }
+}
+
+
+//Verify OTP
+const verifyotp = async(req,res)=>{
+  // const { otp } = req.body;
+  // const { token } = req.params;
+  // console.log("token",token);
+  // const decoded = jwt.verify(token, process.env.SECRET);
+  //   console.log("decoded",decoded);
+  //   const user = await User.findById(decoded.userId);
+  //   console.log("user",user);
+  // // Verify the OTP
+  // if (otp === user.otp) {
+  //   console.log('OTP verification successful!');
+  //   res.status(200).json({ msg: 'OTP verification successful!' });
+  // } else {
+  //   console.log('OTP verification failedddd.');
+  //   res.status(400).json({ msg: 'OTP verification failed.' });
+  // }
+
+
+
+  try {
+    const { token } = req.params;
+    console.log("token",token);
+    const { otp } = req.body;
+    // console.log("password",password);
+
+    const decoded = jwt.verify(token, process.env.SECRET);
+    console.log("decoded",decoded);
+    const user = await User.findById(decoded.userId);
+    console.log("user",user);
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid token' });
+    }
+    console.log(otp === user.otp)
+    if (otp === user.otp) {
+      console.log('OTP verification successful!');
+      res.status(200).json({ msg: 'OTP verification successful!' });
+    }
+    // const hashedPassword = await bcrypt.hash(password, 10);
+    // console.log("hashedPassword",hashedPassword);
+    // user.password = hashedPassword;
+    // console.log("user.password",user.password);
+    // console.log("user",user);
+    // await user.save();
+    // console.log("userrrrr",user);
+
+    // res.status(200).json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+
+}
 
 
 //For Logout
@@ -235,4 +376,6 @@ const resetpassword = async(req,res)=>{
   }
 }
 
-export { registerUser , loginUser ,logoutUser, tokenIsValid,authCheck,forgotpassword,resetpassword};
+
+
+export { registerUser , loginUser ,logoutUser, tokenIsValid,authCheck,forgotpassword,resetpassword,sendotp,verifyotp};
