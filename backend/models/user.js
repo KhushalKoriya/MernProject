@@ -13,11 +13,14 @@ var UserSchema = new mongoose.Schema({
         versionKey: false,
     });
 
-//  UserSchema.pre("save",async function(next){
-//     const salt = await bcrypt.genSalt(10);
-//     this.password=await bcrypt.hash(this.password,salt);
-//     next();
-//  })   
-
+ UserSchema.pre("save",async function(next){
+    const salt = await bcrypt.genSalt(10);
+    console.log(salt,"salt");
+    this.password=await bcrypt.hash(this.password,salt);
+    next();
+ })   
+ UserSchema.methods.comparePassword = async function(passwords){
+    return bcrypt.compare(passwords, this.password)
+ }
 var userModel = mongoose.model("User", UserSchema);
 export default userModel;

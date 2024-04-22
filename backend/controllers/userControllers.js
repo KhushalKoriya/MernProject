@@ -10,12 +10,12 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const encryptedPassword = await bcrypt.hash(password, 10);
-
+    // const encryptedPassword = await bcrypt.hash(password, 10);
+console.log(password,"passwordpasswordpassword");
     const newUser = await User.create({
       username: name,
       email: email.toLowerCase(),
-      password:encryptedPassword
+      password:password
     });
     if (newUser) {
       return res
@@ -26,7 +26,7 @@ const registerUser = async (req, res) => {
     return res
       .status(500)
       .send({
-        error: `Error occured while creating user due to : ${error.message}`,
+        error: `Error occured while creating user due to : ${error}`,
       });
   }
 };
@@ -46,13 +46,16 @@ const loginUser = async (req, res) => {
       .status(400)
       .send({ message: "User Not found.Please Sign Up in the System!." });
   }
-
-  if (!(await bcrypt.compare(password, isUserLoggedIn.password))) {
+  var comparepss = await bcrypt.compare(password, isUserLoggedIn.password)
+console.log("password",password);
+console.log("isUserLoggedIn.password",isUserLoggedIn.password);
+console.log("bcrypt.compare(password, isUserLoggedIn.password)",comparepss);
+  if (!(await isUserLoggedIn.comparePassword(password))) {
     return res
       .status(400)
       .send({ message: "Authentication failed.Please enter valid password." });
   }
-  const token = jwt.sign({ id: isUserLoggedIn._id }, process.env.SECRET);
+  const token = jwt.sign({ id: isUserLoggedIn._id }, process.env.SECRET,{ expiresIn: '1m' });
   const sessUser = { id: isUserLoggedIn._id, isAdmin: isUserLoggedIn.isAdmin ,username: isUserLoggedIn.username ,token,active:isUserLoggedIn.active};
   // console.log(sessUser);
   req.session.user = sessUser;
@@ -226,17 +229,25 @@ const tokenIsValid = async (req, res) => {
     const token = req.header("x-auth-token");
     if (!token) return res.json(false);
 
-    const verified = jwt.verify(token, process.env.SECRET);
-    if (!verified) return res.json(false);
+    try {
+      const verified = jwt.verify(token, process.env.SECRET);
+      const user = await User.findById(verified.id);
 
-    const user = await User.findById(verified.id);
-    if (!user) return res.json(false);
+      if (!user) {
+        return res.json(false); // User not found
+      }
 
-    return res.json(true);
+      return res.json(true); // Token is valid
+    } catch (err) {
+      // Handle token verification error
+      return res.json(false);
+    }
   } catch (err) {
+    // Handle other errors
     res.status(500).json({ error: err.message });
   }
 }
+
 
 const authCheck =async (req, res) => {
   const user = await User.findById(req.isUserLoggedIn);

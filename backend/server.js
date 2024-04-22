@@ -31,11 +31,13 @@ app.use(cookieParser());
 
 app.use("/",routes);
 //Database connections
+mongoose.set('strictQuery', false);
 mongoose.connect(
     process.env.MONGODB_URI || "mongodb://localhost/Mern",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      family: 4
     },
     (err) => {
       if (err) {

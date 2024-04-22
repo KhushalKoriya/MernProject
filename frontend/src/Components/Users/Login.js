@@ -27,9 +27,9 @@ export const Login = () => {
       setMessage("Please enter valid email.");
       return false;
     }
-    if (user.password.length < 8 || user.password.length > 40) {
+    if (user.password.length < 6 || user.password.length > 40) {
       setSuccessful(false);
-      setMessage("The password must be between 8 and 40 characters.");
+      setMessage("The password must be between 6 and 40 characters.");
       return false;
     }
     return true;

@@ -17,7 +17,6 @@ import { Resetpassword } from "./Components/Users/Resetpassword";
 import { Sendotp } from "./Components/Users/Sendotp";
 import { Verifyotp } from "./Components/Users/Verifyotp";
 // import PrivateRoute from "./Components/Users/PrivateRoute";
-
 function App() {
   const [ userData, setUserData] = useState({
     token: undefined,
@@ -35,22 +34,37 @@ function App() {
         token = "";
       }
 
-      const tokenResponse = await axios.post('http://localhost:8081/tokenIsValid', null, {headers: {"x-auth-token": token}});
-      // console.log(tokenResponse);
-      if (tokenResponse.data) {
-        const userRes =  axios.get("http://localhost:8081/authcheck", {
-          headers: { "x-auth-token": token },
-        });
-        // console.log(userRes);
-        setUserData({
-          token,
-          user: userRes.data,
-        });
+      try {
+        const tokenResponse = await axios.post('http://localhost:8081/tokenIsValid', null, {headers: {"x-auth-token": token}});
+        console.log(tokenResponse,"tokenResponse");
+
+        if (tokenResponse.data) {
+          try {
+            const userRes = await axios.get("http://localhost:8081/authcheck", {
+              headers: { "x-auth-token": token },
+            });
+            console.log(userRes,"userRes");
+            setUserData({
+              token,
+              user: userRes.data,
+            });
+          } catch (error) {
+            console.error("Error fetching user data:", error.message);
+            // Handle error fetching user data
+          }
+        } else {
+          console.log("Token is not valid");
+          // Handle invalid token
+        }
+      } catch (error) {
+        console.error("Error checking token validity:", error.message);
+        // Handle error checking token validity
       }
     }
 
     checkLoggedIn();
   }, []);
+
 
   return (
     <>

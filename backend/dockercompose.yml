@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  server:
+    build: ""
+    network_mode: host
+    ports: 
+      - '8081:8081'
+    environment:
+      - PORT=8081
+      - CLIENT_URL=http://localhost:3000
+      - SECRET=thisismysecrctekeyfhrgfgrfrtyfwir15751
+      - MONGODB_URI=mongodb://localhost:27017/Mern
+      - REFRESH_SECRET = "thisismyrefreshsecretkeyforaccess"
+      - SMTP_EMAIL = 'kkoriya01@gmail.com'
+      - SMTP_PASSWORD ='agqbgtkkadnznrlc'
